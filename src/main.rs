@@ -3,6 +3,15 @@ use std::fs::File;
 use std::io::BufReader;
 use std::io::prelude::*;
 
+/**
+ * Given a file, read the first line as a reference sequence of characters
+ * and, for each remaining line, compare the line to the reference sequence
+ * and output a string of 0s and 1s, where a 0 in the nth position in a line
+ * indicates that the nth characters match and a 1 indicates that they don't
+ *
+ * For lines longer than the reference sequence, ignore the extra characters
+ * For lines shorter than the reference sequence, pad w/ 0s
+ */
 fn main() -> std::io::Result<()> {
     let args: Vec<String> = env::args().collect();
 
@@ -29,19 +38,11 @@ fn read_file(file: File) -> std::io::Result<()> {
             // Remove linebreak
             line = line.trim().into();
 
-            if ref_seq.len() != line.len() {
-                println!("Sequences are of different lengths.");
-                println!("Reference sequence: {}", ref_seq);
-                println!("Other sequence:     {}", line);
-                println!("Reference sequence length: {}", ref_seq.len());
-                println!("Other sequence length:     {}", line.len());
-
-                return Ok(());
-            }
-
             let diff: String = ref_seq.chars()
                 .zip(line.drain(..))
                 .map(|(ref_char, other_char)| if ref_char == other_char { '0' } else { '1' })
+                .chain(std::iter::repeat('0')) // If given sequence is shorter than ref_seq, pad with 0.
+                .take(ref_seq.len())
                 .collect();
 
             println!("{}", diff);
