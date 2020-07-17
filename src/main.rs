@@ -20,19 +20,23 @@ fn read_file(file: File) -> std::io::Result<()> {
     let read_chars = buf_reader.read_line(&mut line)?;
     if read_chars != 0 {
         // Remove linebreak
-        line.pop();
+        line = line.trim().into();
 
         let ref_seq = line.clone();
         line.clear();
 
         while buf_reader.read_line(&mut line)? != 0 {
             // Remove linebreak
-            line.pop();
+            line = line.trim().into();
 
             if ref_seq.len() != line.len() {
                 println!("Sequences are of different lengths.");
                 println!("Reference sequence: {}", ref_seq);
                 println!("Other sequence:     {}", line);
+                println!("Reference sequence length: {}", ref_seq.len());
+                println!("Other sequence length:     {}", line.len());
+
+                return Ok(());
             }
 
             let diff: String = ref_seq.chars()
